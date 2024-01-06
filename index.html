@@ -1,0 +1,163 @@
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  table, th, td {
+    border: 1px solid black;
+  }
+</style>
+
+<div id="input">input</div>
+<hr>
+<div id="barang">barang</div>
+<hr>
+<div id="tas">tas</div>
+<div id="tas_item">tas items</div>
+
+<script type="text/javascript">
+
+  barang = [
+    { id: 1, nama: 'Coklat', harga: 15000, banyak: 1 },
+    { id: 2, nama: 'Biskuit', harga: 20000, banyak: 2 },
+    { id: 3, nama: 'Permen', harga: 10000, banyak: 3 },
+  ];
+
+  tas = [
+    { id: 1, tanggal: '2024-01-06', total: 0, kasir: 'Happy Shoping' },
+  ];
+
+  tas_barang = [
+    { id: 1, idtas: 1, idbarang: 1, nama: 'Coklat', harga: 15000, banyak: 1, jumlah: 15000 },
+    { id: 2, idtas: 2, idbarang: 2, nama: 'Biskuit', harga: 20000, banyak: 2, jumlah: 40000 },
+  ];
+
+  input = ['id', 'nama', 'harga', 'banyak'];
+  out = `<form name='frm'>`;
+
+  input.forEach(function myFunction(item, index) {
+    out += `${item}  <input name="${item}"> <br>`;
+  });
+
+  out += `</form>`;
+  out += `<button onclick="tambahBarang()"> Tambah Barang </button>`;
+  document.getElementById('input').innerHTML = out;
+
+  function init() {
+    out = ``;
+
+    barang.forEach(function myFunction(item, index) {
+      out += `${item.id} | ${item.banyak} | ${item.nama} | ${item.harga} <button onclick="add(${item.id})"> add </button> <br/> `;
+    });
+    document.getElementById('barang').innerHTML = out;
+
+    out = ` <button onclick="buatTasBaru()"> Buat Tas Baru </button> <button onclick="cetak()"> Cetak</button><br>`;
+    tas.forEach(function myFunction(item, index) {
+      out += 'Tanggal:' + item.tanggal + " <br> ";
+      out += 'Kasir:' + item.kasir + " <br> ";
+      out += 'Kode:' + item.id + " <br> ";
+      out += 'Total:' + item.total + " <br> ";
+    });
+
+    document.getElementById('tas').innerHTML = out;
+
+    out = ``;
+    out = `<table>`;
+    out += `<tr>
+              <td>Id Tas</td>
+              <td>Id Barang</td>
+              <td>Banyak Barang</td>
+              <td>Nama Barang</td>
+              <td>Harga Barang</td>
+              <td>Jumlah</td>
+              <td>Aksi</td>
+            </tr>`;
+
+    tas_barang.forEach(function myFunction(item, index) {
+      out += `<tr>
+                  <td>${item.idtas}</td>
+                  <td>${item.idbarang}</td>
+                  <td>${item.banyak}</td>
+                  <td>${item.nama}</td>
+                  <td>${item.harga}</td>
+                  <td>${item.jumlah}</td>
+                  <td><button onclick="remove(${index})"> remove </button></td>
+                </tr>`;
+    });
+
+    out += `</table>`;
+    document.getElementById('tas_item').innerHTML = out;
+  }
+
+  init();
+
+  function add(i) {
+    const item = barang.find(e => e.id === i);
+
+    if(item) {
+      const newItem = {
+        id: tas_barang.length + 1, // Generate a new unique ID
+        idtas: tas[0].id,
+        idbarang: item.id,
+        nama: item.nama,
+        harga: item.harga,
+        banyak: item.banyak,
+        jumlah: item.harga * item.banyak,
+      };
+      tas_barang.push(newItem);
+      updateTotal();
+      init();
+    } else {
+      console.error('Item not found');
+    }
+  }
+
+  function updateTotal() {
+    tas[0].total = tas_barang.reduce((total, item) => total + item.jumlah, 0);
+  }
+
+  function tambahBarang() {
+    const newItem = {
+      id: tas_barang.length + 1, // Generate a new unique ID
+      idtas: tas[0].id,
+      idbarang: frm.elements[0].value,
+      nama: frm.elements[1].value,
+      harga: frm.elements[2].value,
+      banyak: frm.elements[3].value,
+      jumlah: frm.elements[2].value * frm.elements[3].value,
+    };
+
+    tas_barang.push(newItem);
+    updateTotal();
+    init();
+  }
+
+  function buatTasBaru() {
+    tas.push({
+      id: tas.length + 1,
+      tanggal: getCurrentDate(), // Use your preferred way to get the current date
+      total: 0,
+      kasir: 'Happy Shoping',
+    });
+    tas_barang = []; // Reset tas_barang array
+    updateTotal();
+    init();
+  }
+
+  function getCurrentDate() {
+    // Implement your own logic to get the current date in the desired format
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function remove(i) {
+    tas_barang.splice(i, 1);
+    updateTotal();
+    init();
+  }
+
+  function cetak() {
+    window.print();
+  }
+
+</script>
